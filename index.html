@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Museion — Digital Scroll Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --void: #050509;
+    --surface: #0d0d14;
+    --surface-2: #14141f;
+    --surface-3: #1c1c2a;
+    --border: rgba(255,255,255,0.07);
+    --border-soft: rgba(255,255,255,0.04);
+    --text: #f5f5f7;
+    --text-2: rgba(245,245,247,0.68);
+    --text-3: rgba(245,245,247,0.40);
+    --text-4: rgba(245,245,247,0.22);
+    --pink: #e0607e;
+    --pink-dim: rgba(224,96,126,0.12);
+    --gold: #f7c948;
+    --gold-dim: rgba(247,201,72,0.10);
+    --blue: #7eb8f7;
+    --font-body: 'DM Sans', sans-serif;
+    --font-head: 'Syne', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+  }
+  html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+  body {
+    background: var(--void);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.65;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; top: -15%; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse,
+      rgba(224,96,126,0.05) 0%,
+      rgba(247,201,72,0.03) 35%,
+      transparent 65%
+    );
+    pointer-events: none; z-index: 0;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem;
+    background: rgba(5,5,9,0.88);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+  .nav-brand {
+    font-family: var(--font-head);
+    font-size: 0.9375rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text); text-decoration: none;
+  }
+  .nav-brand .accent { background: linear-gradient(90deg,var(--pink),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .nav-right { display: flex; align-items: center; gap: 1.25rem; }
+  .nav-badge {
+    font-family: var(--font-mono); font-size: 0.625rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--pink); border: 1px solid rgba(224,96,126,0.3);
+    border-radius: 999px; padding: 0.25rem 0.75rem;
+  }
+  .hero {
+    max-width: 800px; margin: 0 auto;
+    padding: 140px 2rem 80px;
+    position: relative; z-index: 1;
+    text-align: center;
+  }
+  .hero-emblem {
+    width: 72px; height: 72px; border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 2rem; position: relative;
+    opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both;
+  }
+  .hero-emblem::before {
+    content: ''; position: absolute; inset: -1.5px; border-radius: 50%;
+    background: conic-gradient(from 180deg, var(--pink) 0deg, transparent 100deg, var(--gold) 240deg, transparent 360deg);
+    -webkit-mask: radial-gradient(circle, transparent calc(100% - 1.5px), black calc(100% - 1.5px));
+    mask: radial-gradient(circle, transparent calc(100% - 1.5px), black calc(100% - 1.5px));
+    animation: spin 10s linear infinite;
+  }
+  .hero-emblem-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink), var(--gold));
+  }
+  .hero-eyebrow {
+    font-family: var(--font-mono); font-size: 0.6875rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-4); margin-bottom: 1.25rem;
+    opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+  }
+  .hero-title {
+    font-family: var(--font-head);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800; letter-spacing: -0.04em; line-height: 1;
+    margin-bottom: 0.75rem;
+    opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s both;
+  }
+  .hero-title .gradient {
+    background: linear-gradient(135deg, var(--text) 0%, var(--text-2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .hero-subtitle {
+    font-size: 1.125rem; color: var(--text-3);
+    max-width: 480px; margin: 0 auto 3rem; line-height: 1.7;
+    opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.4s both;
+  }
+  .hero-divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0 auto 3rem;
+    opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.45s both;
+  }
+
+  .scrolls-section {
+    max-width: 800px; margin: 0 auto;
+    padding: 0 2rem 100px;
+    position: relative; z-index: 1;
+  }
+  .section-label {
+    font-family: var(--font-mono); font-size: 0.6875rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text-4); margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .section-gap { margin-top: 3rem; }
+  .scroll-list {
+    display: flex; flex-direction: column; gap: 0.75rem;
+    opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.6s both;
+  }
+  .scroll-list-2 {
+    display: flex; flex-direction: column; gap: 0.75rem;
+    opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.75s both;
+  }
+  .scroll-entry {
+    display: flex; align-items: center; gap: 1.5rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.25rem 1.5rem;
+    text-decoration: none; color: inherit;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    position: relative; overflow: hidden;
+  }
+  .scroll-entry::after {
+    content: ''; position: absolute; right: 1.5rem; top: 50%;
+    transform: translateY(-50%); width: 20px; height: 20px;
+    border-radius: 50%; background: var(--surface-3);
+    opacity: 0; transition: opacity 0.2s;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 5H8M8 5L5 2M8 5L5 8' stroke='rgba(245,245,247,0.4)' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: center;
+  }
+  .scroll-entry:hover { background: var(--surface-2); transform: translateX(3px); }
+  .scroll-entry:hover::after { opacity: 1; }
+  .scroll-entry.available:hover { border-color: rgba(224,96,126,0.25); }
+  .scroll-entry.gold:hover { border-color: rgba(247,201,72,0.25); }
+  .scroll-entry.locked { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+  .entry-num {
+    font-family: var(--font-head); font-size: 1.75rem; font-weight: 800;
+    line-height: 1; color: var(--text-4); min-width: 52px; text-align: center; flex-shrink: 0;
+  }
+  .entry-num.active { color: var(--text-2); }
+  .entry-num.gold-num { color: rgba(247,201,72,0.55); }
+  .entry-body { flex: 1; min-width: 0; }
+  .entry-title {
+    font-family: var(--font-head); font-size: 1rem; font-weight: 600;
+    color: var(--text); margin-bottom: 0.25rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .entry-desc { font-size: 0.875rem; color: var(--text-3); line-height: 1.5; }
+  .entry-badge {
+    font-family: var(--font-mono); font-size: 0.5625rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.2rem 0.6rem; border-radius: 999px; flex-shrink: 0;
+  }
+  .badge-available { color: var(--pink); border: 1px solid rgba(224,96,126,0.3); background: var(--pink-dim); }
+  .badge-gold { color: var(--gold); border: 1px solid rgba(247,201,72,0.3); background: var(--gold-dim); }
+  .badge-blue { color: var(--blue); border: 1px solid rgba(126,184,247,0.3); background: rgba(126,184,247,0.08); }
+  .badge-locked { color: var(--text-4); border: 1px solid var(--border); }
+  .scroll-entry.blue:hover { border-color: rgba(126,184,247,0.25); }
+  .entry-num.blue-num { color: rgba(126,184,247,0.55); }
+  .scroll-list-3 { display: flex; flex-direction: column; gap: 0.75rem; opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.9s both; }
+
+  .build-status {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.75rem 2rem; margin-bottom: 3rem;
+    opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.55s both;
+  }
+  .build-status-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #4caf87; box-shadow: 0 0 8px rgba(76,175,135,0.5);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .status-label {
+    font-family: var(--font-mono); font-size: 0.6875rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: #4caf87;
+  }
+  .build-version { font-family: var(--font-head); font-size: 1.125rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+  .build-desc { font-size: 0.9375rem; color: var(--text-3); line-height: 1.65; }
+  .build-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
+  .build-chip {
+    font-family: var(--font-mono); font-size: 0.5625rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-3); border: 1px solid var(--border);
+    border-radius: 999px; padding: 0.2rem 0.75rem;
+  }
+  footer {
+    border-top: 1px solid var(--border); padding: 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+    max-width: 800px; margin: 0 auto; position: relative; z-index: 1;
+  }
+  .footer-text {
+    font-family: var(--font-mono); font-size: 0.6875rem;
+    color: var(--text-4); letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.6;
+  }
+  .footer-brand {
+    font-family: var(--font-head); font-size: 0.875rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--pink), var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  @media (max-width: 640px) {
+    nav { padding: 0 1.25rem; }
+    .hero { padding: 100px 1.25rem 60px; }
+    .scrolls-section { padding: 0 1.25rem 80px; }
+    .scroll-entry { padding: 1rem 1.25rem; gap: 1rem; }
+    .entry-num { font-size: 1.25rem; min-width: 36px; }
+    footer { padding: 2rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#">Æ<span class="accent">ther</span> · Museion</a>
+  <div class="nav-right">
+    <span class="nav-badge">Partner Brief</span>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-emblem"><div class="hero-emblem-dot"></div></div>
+  <div class="hero-eyebrow">Museion · Digital Scroll Series · April 2026</div>
+  <h1 class="hero-title"><span class="gradient">The Scrolls</span></h1>
+  <p class="hero-subtitle">A series of short documents explaining the ideas, principles, and architecture behind what we're building. Start anywhere.</p>
+  <div class="hero-divider"></div>
+</header>
+
+<div class="scrolls-section">
+
+  <div class="build-status">
+    <div class="build-status-header">
+      <div class="status-dot"></div>
+      <span class="status-label">Build Live · v0.6 · 20 Scrolls Available</span>
+    </div>
+    <div class="build-version">Museion v0.6 — Architecture Series Live</div>
+    <div class="build-desc">The full Next.js application is built and running. Aether chat UI, 19 specialist system prompts, intent router, and live API are all complete. Ten founding scrolls plus ten new Architecture Series scrolls covering the Five-Layer Stack, the Hidden Council, the Non-Greedy Covenant, Memory as Moat, the HUD spec, and the twelve-month partnership roadmap.</div>
+    <div class="build-chips">
+      <span class="build-chip">Next.js 14</span>
+      <span class="build-chip">TypeScript Strict</span>
+      <span class="build-chip">19 Specialists</span>
+      <span class="build-chip">Anthropic Claude</span>
+      <span class="build-chip">OpenAI Fallback</span>
+      <span class="build-chip">Edge Runtime</span>
+      <span class="build-chip">20 Scrolls Live</span>
+    </div>
+  </div>
+
+
+  <div class="section-label">Museion Series · HTML — Scrolls 001–006</div>
+
+  <div class="scroll-list">
+
+    <a class="scroll-entry available" href="scroll-001.html">
+      <div class="entry-num active">001</div>
+      <div class="entry-body">
+        <div class="entry-title">The Personal Aether Protocol</div>
+        <div class="entry-desc">The foundational case for AI as a relationship, not a tool. The single interface. The five principles. The memory moat.</div>
+      </div>
+      <span class="entry-badge badge-available">Read</span>
+    </a>
+
+    <a class="scroll-entry available" href="scroll-002.html">
+      <div class="entry-num active">002</div>
+      <div class="entry-body">
+        <div class="entry-title">Sovereign AI Defense</div>
+        <div class="entry-desc">Why most AI is built against you. The architectural principles that change the alignment.</div>
+      </div>
+      <span class="entry-badge badge-available">Read</span>
+    </a>
+
+    <a class="scroll-entry available" href="scroll-003.html">
+      <div class="entry-num active">003</div>
+      <div class="entry-body">
+        <div class="entry-title">The Solo Leveling System</div>
+        <div class="entry-desc">Five tiers. Immutable progression. The ledger that can't be bought, gamed, or faked.</div>
+      </div>
+      <span class="entry-badge badge-available">Read</span>
+    </a>
+
+    <a class="scroll-entry available" href="scroll-004.html">
+      <div class="entry-num active">004</div>
+      <div class="entry-body">
+        <div class="entry-title">Aether: The Loyal Intelligence</div>
+        <div class="entry-desc">The design philosophy. The eight quality dimensions. How Aether differs from every general-purpose AI at the architectural level.</div>
+      </div>
+      <span class="entry-badge badge-available">Read</span>
+    </a>
+
+    <a class="scroll-entry available" href="scroll-005.html">
+      <div class="entry-num active">005</div>
+      <div class="entry-body">
+        <div class="entry-title">The Limitless Council</div>
+        <div class="entry-desc">All 19 specialists documented for the first time. The Original Six. The Limitless Thirteen. How the council unlocks across tiers.</div>
+      </div>
+      <span class="entry-badge badge-available">Read</span>
+    </a>
+
+    <a class="scroll-entry available" href="scroll-006.html">
+      <div class="entry-num active">006</div>
+      <div class="entry-body">
+        <div class="entry-title">The YAKK Mission</div>
+        <div class="entry-desc">Why YAKK Studios exists. Who built it. The moral architecture behind every product decision.</div>
+      </div>
+      <span class="entry-badge badge-available">Read</span>
+    </a>
+
+  </div>
+
+
+  <div class="section-gap"></div>
+  <div class="section-label">Digital Scroll Series · HTML — Scrolls 007–010</div>
+
+  <div class="scroll-list-2">
+
+    <a class="scroll-entry gold" href="scroll-007.html">
+      <div class="entry-num gold-num">007</div>
+      <div class="entry-body">
+        <div class="entry-title">The Cabal Detection Engine</div>
+        <div class="entry-desc">How Museion surfaces coordinated manipulation, adversarial signals, and hidden agendas in real time.</div>
+      </div>
+      <span class="entry-badge badge-gold">Read</span>
+    </a>
+
+    <a class="scroll-entry gold" href="scroll-008.html">
+      <div class="entry-num gold-num">008</div>
+      <div class="entry-body">
+        <div class="entry-title">$YST Token, Gates &amp; Economics</div>
+        <div class="entry-desc">The token mechanics, gate system, and economic model that make sovereign AI sustainable.</div>
+      </div>
+      <span class="entry-badge badge-gold">Read</span>
+    </a>
+
+    <a class="scroll-entry gold" href="scroll-009.html">
+      <div class="entry-num gold-num">009</div>
+      <div class="entry-body">
+        <div class="entry-title">The dApp: 32 Sections &amp; Tech Stack</div>
+        <div class="entry-desc">The full architecture. Every section of the application, documented and mapped.</div>
+      </div>
+      <span class="entry-badge badge-gold">Read</span>
+    </a>
+
+    <a class="scroll-entry gold" href="scroll-010.html">
+      <div class="entry-num gold-num">010</div>
+      <div class="entry-body">
+        <div class="entry-title">The StakePoint &amp; StreamLock Partnership</div>
+        <div class="entry-desc">How Museion integrates with Stakepoint and Streamlock. The shared infrastructure layer.</div>
+      </div>
+      <span class="entry-badge badge-gold">Read</span>
+    </a>
+
+  </div>
+
+
+  <div class="section-gap"></div>
+  <div class="section-label">Architecture Series · HTML — Scrolls 011–020</div>
+
+  <div class="scroll-list-3">
+
+    <a class="scroll-entry blue" href="scroll-011.html">
+      <div class="entry-num blue-num">011</div>
+      <div class="entry-body">
+        <div class="entry-title">The Five-Layer Stack</div>
+        <div class="entry-desc">Voice, Aether persona, hidden council, Alexandria archive, governed execution rails — how the full system layers together.</div>
+      </div>
+      <span class="entry-badge badge-blue">Read</span>
+    </a>
+
+    <a class="scroll-entry blue" href="scroll-012.html">
+      <div class="entry-num blue-num">012</div>
+      <div class="entry-body">
+        <div class="entry-title">Æther vs Ultron</div>
+        <div class="entry-desc">The alignment doctrine. Five anti-drift mechanisms that keep a sovereign AI on the user's side.</div>
+      </div>
+      <span class="entry-badge badge-blue">Read</span>
+    </a>
+
+    <a class="scroll-entry blue" href="scroll-013.html">
+      <div class="entry-num blue-num">013</div>
+      <div class="entry-body">
+        <div class="entry-title">Memory as Moat</div>
+        <div class="entry-desc">Three-tier memory — Operator, Council, Archive. Why forgetting is a feature, not a bug.</div>
+      </div>
+      <span class="entry-badge badge-blue">Read</span>
+    </a>
+
+    <a class="scroll-entry blue" href="scroll-014.html">
+      <div class="entry-num blue-num">014</div>
+      <div class="entry-body">
+        <div class="entry-title">The Hidden Council</div>
+        <div class="entry-desc">Nineteen specialists, one router. Scoped inputs, structured outputs, rate limits, observable failure.</div>
+      </div>
+      <span class="entry-badge badge-blue">Read</span>
+    </a>
+
+    <a class="scroll-entry blue" href="scroll-015.html">
+      <div class="entry-num blue-num">015</div>
+      <div class="entry-body">
+        <div class="entry-title">Proactive Truth-Seeking</div>
+        <div class="entry-desc">Six deterministic signals. Event-driven detection. Auto-filing RD-XXX scrolls the moment evidence crosses threshold.</div>
+      </div>
+      <span class="entry-badge badge-blue">Read</span>
+    </a>
+
+    <a class="scroll-entry blue" href="scroll-016.html">
+      <div class="entry-num blue-num">016</div>
+      <div class="entry-body">
+        <div class="entry-title">The Non-Greedy Covenant</div>
+        <div class="entry-desc">Eight hard refusals encoded as code, not policy. What a fiduciary AI will not do, ever.</div>
+      </div>
+      <span class="entry-badge badge-blue">Read</span>
+    </a>
+
+    <a class="scroll-entry blue" href="scroll-017.html">
+      <div class="entry-num blue-num">017</div>
+      <div class="entry-body">
+        <div class="entry-title">Alexandria as Anti-Corruption Substrate</div>
+        <div class="entry-desc">One hundred scrolls in five categories. Three storage shapes. Proof-before-permanence curation.</div>
+      </div>
+      <span class="entry-badge badge-blue">Read</span>
+    </a>
+
+    <a class="scroll-entry blue" href="scroll-018.html">
+      <div class="entry-num blue-num">018</div>
+      <div class="entry-body">
+        <div class="entry-title">Solo Leveling</div>
+        <div class="entry-desc">Witness to Sovereign. Competence as receipt. Levels unlock agency, not discounts.</div>
+      </div>
+      <span class="entry-badge badge-blue">Read</span>
+    </a>
+
+    <a class="scroll-entry blue" href="scroll-019.html">
+      <div class="entry-num blue-num">019</div>
+      <div class="entry-body">
+        <div class="entry-title">The Empire HUD</div>
+        <div class="entry-desc">Voice-first, telemetry-rich, embeddable. The partner-embed surface spec — ambient, active, urgent tiers.</div>
+      </div>
+      <span class="entry-badge badge-blue">Read</span>
+    </a>
+
+    <a class="scroll-entry blue" href="scroll-020.html">
+      <div class="entry-num blue-num">020</div>
+      <div class="entry-body">
+        <div class="entry-title">The Permanence Chain</div>
+        <div class="entry-desc">The closing synthesis. Twelve-month joint roadmap. Council → archive → surface, signed end to end.</div>
+      </div>
+      <span class="entry-badge badge-blue">Read</span>
+    </a>
+
+  </div>
+
+</div><!-- /scrolls-section -->
+
+<footer>
+  <div class="footer-text">
+    Museion · YAKK Studios · April 2026<br />
+    For StakePoint &amp; StreamLock Teams
+  </div>
+  <div class="footer-brand">YAKK Studios</div>
+</footer>
+
+</body>
+</html>

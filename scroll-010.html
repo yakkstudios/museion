@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scroll #010 — The StakePoint & StreamLock Partnership | YAKK Studios</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0A0A0F;
+    --bg2: #0f0f18;
+    --pink: #e0607e;
+    --gold: #f7c948;
+    --purple: #C026FF;
+    --cyan: #00D4FF;
+    --green: #22c55e;
+    --red: #ef4444;
+    --text: #f5f5f7;
+    --muted: #8a8a9a;
+    --border: rgba(0,212,255,0.12);
+    --border-gold: rgba(247,201,72,0.15);
+    --border-pink: rgba(224,96,126,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 17px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 28px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(16px);
+    z-index: 100;
+  }
+
+  .header-brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pink); }
+  .header-meta { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; opacity: 0.6; }
+
+  .hero-wrap { position: relative; overflow: hidden; border-bottom: 1px solid var(--border); }
+
+  .hero-glow {
+    position: absolute; top: -120px; left: 50%; transform: translateX(-50%);
+    width: 700px; height: 450px;
+    background: radial-gradient(ellipse, rgba(247,201,72,0.10) 0%, rgba(224,96,126,0.06) 50%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero { max-width: 760px; margin: 0 auto; padding: 88px 48px 72px; position: relative; }
+
+  .scroll-number { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--pink); text-transform: uppercase; display: block; margin-bottom: 24px; opacity: 0.8; }
+
+  .hero-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(40px, 6vw, 68px); line-height: 1.05; color: var(--text); margin-bottom: 28px; }
+
+  .hero-tagline { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 0.15em; color: var(--gold); text-transform: uppercase; margin-bottom: 20px; opacity: 0.9; }
+
+  .subtitle { font-size: 18px; color: var(--muted); line-height: 1.65; max-width: 580px; }
+  .hero-divider { width: 48px; height: 2px; background: linear-gradient(90deg, var(--gold), transparent); margin-top: 40px; }
+
+  .content { max-width: 760px; margin: 0 auto; padding: 64px 48px 80px; }
+  .content p { margin-bottom: 24px; color: var(--muted); }
+  .content p:last-child { margin-bottom: 0; }
+  .lead { font-size: 20px; color: var(--text) !important; line-height: 1.65; margin-bottom: 32px !important; }
+
+  .content h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px; color: var(--text); margin: 56px 0 20px; line-height: 1.2; }
+  .content h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; color: var(--text); margin: 32px 0 12px; }
+
+  /* Partner cards */
+  .partner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 36px 0; }
+  .partner-card {
+    border-radius: 16px;
+    padding: 32px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .partner-card-spt {
+    background: linear-gradient(135deg, rgba(0,212,255,0.06) 0%, rgba(0,212,255,0.02) 100%);
+    border: 1px solid rgba(0,212,255,0.2);
+  }
+  .partner-card-lock {
+    background: linear-gradient(135deg, rgba(247,201,72,0.06) 0%, rgba(247,201,72,0.02) 100%);
+    border: 1px solid rgba(247,201,72,0.2);
+  }
+  .partner-ticker {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .partner-ticker-spt { color: var(--cyan); }
+  .partner-ticker-lock { color: var(--gold); }
+  .partner-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: var(--text); margin-bottom: 14px; }
+  .partner-desc { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+  .partner-mint { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.5; }
+  .partner-mint-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; opacity: 0.6; }
+
+  /* Token address block */
+  .addr-block {
+    background: #080810;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    line-height: 2;
+    color: #b8bfd8;
+  }
+  .addr-block .label { color: var(--muted); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-top: 12px; margin-bottom: 2px; }
+  .addr-block .label:first-child { margin-top: 0; }
+  .addr-block .addr { color: var(--cyan); }
+  .addr-block .addr-gold { color: var(--gold); }
+
+  /* Stats row */
+  .stats-row { display: flex; gap: 16px; margin: 40px 0; flex-wrap: wrap; }
+  .stat-card {
+    flex: 1; min-width: 140px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 20px;
+  }
+  .stat-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 30px; color: var(--text); line-height: 1; }
+  .stat-val.cyan { color: var(--cyan); }
+  .stat-val.gold { color: var(--gold); }
+  .stat-val.pink { color: var(--pink); }
+  .stat-val.green { color: var(--green); }
+  .stat-lbl { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-top: 6px; }
+
+  /* Tax flow diagram */
+  .tax-flow {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    margin: 28px 0;
+  }
+  .tax-flow-title {
+    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 20px;
+  }
+  .tax-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .tax-row:last-child { border-bottom: none; }
+  .tax-pct {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px;
+    width: 72px; flex-shrink: 0; text-align: right;
+  }
+  .tax-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+  .tax-bar { height: 100%; border-radius: 4px; }
+  .tax-info { min-width: 200px; }
+  .tax-dest { font-size: 14px; color: var(--text); font-weight: 500; }
+  .tax-note { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+  /* Integration table */
+  .int-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+  .int-table th {
+    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); text-align: left;
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+  }
+  .int-table td {
+    padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.03);
+    font-size: 14px; color: var(--muted); vertical-align: top;
+  }
+  .int-table tr:last-child td { border-bottom: none; }
+  .int-table td:first-child { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--cyan); font-weight: 700; white-space: nowrap; }
+  .int-table td:nth-child(2) { color: var(--text); }
+
+  /* Info cards */
+  .info-card {
+    background: var(--bg2);
+    border: 1px solid var(--border-gold);
+    border-left: 3px solid var(--gold);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 32px 0;
+  }
+  .info-card-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+  .info-card p { color: var(--muted); margin: 0; }
+
+  .info-card-cyan {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--cyan);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 32px 0;
+  }
+  .info-card-cyan .info-card-label { color: var(--cyan); }
+
+  .info-card-pink {
+    background: var(--bg2);
+    border: 1px solid var(--border-pink);
+    border-left: 3px solid var(--pink);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 32px 0;
+  }
+  .info-card-pink .info-card-label { color: var(--pink); }
+
+  /* Badge */
+  .badge {
+    display: inline-block; font-family: 'Space Mono', monospace; font-size: 9px;
+    letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 7px;
+    border-radius: 4px; font-weight: 700;
+  }
+  .b-green { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+  .b-gold { background: rgba(247,201,72,0.12); color: var(--gold); border: 1px solid rgba(247,201,72,0.2); }
+  .b-cyan { background: rgba(0,212,255,0.10); color: var(--cyan); border: 1px solid rgba(0,212,255,0.2); }
+
+  /* Code block */
+  .code-block {
+    background: #080810;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #b8bfd8;
+    margin: 24px 0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .code-block .kw { color: var(--cyan); }
+  .code-block .str { color: var(--gold); }
+  .code-block .cm { color: #4a4a6a; }
+  .code-block .fn { color: var(--pink); }
+  .code-block .val { color: var(--green); }
+
+  /* Pull quote */
+  .pull-quote {
+    border-left: 3px solid var(--gold);
+    padding: 20px 28px;
+    margin: 40px 0;
+    background: rgba(247,201,72,0.03);
+    border-radius: 0 10px 10px 0;
+  }
+  .pull-quote p { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); font-style: italic; margin: 0; line-height: 1.4; }
+
+  /* Trusted list */
+  .trusted-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+  .trusted-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 16px;
+    text-align: center;
+  }
+  .trusted-ticker { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; color: var(--text); }
+  .trusted-name { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .trusted-badge { margin-top: 10px; }
+
+  /* Callout */
+  .callout-final {
+    background: linear-gradient(135deg, rgba(224,96,126,0.08) 0%, rgba(247,201,72,0.05) 100%);
+    border: 1px solid rgba(224,96,126,0.2);
+    border-radius: 16px;
+    padding: 40px 36px;
+    margin: 48px 0 0;
+    text-align: center;
+  }
+  .callout-final-eyebrow {
+    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--pink); margin-bottom: 18px;
+  }
+  .callout-final h3 {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px;
+    color: var(--text); margin-bottom: 16px; line-height: 1.2;
+  }
+  .callout-final p { font-size: 16px; color: var(--muted); max-width: 520px; margin: 0 auto; }
+
+  /* What each partner does */
+  .role-row {
+    display: flex; gap: 20px; margin: 20px 0; align-items: flex-start;
+  }
+  .role-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .role-icon-spt { background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); }
+  .role-icon-lock { background: rgba(247,201,72,0.08); border: 1px solid rgba(247,201,72,0.2); }
+  .role-text h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 6px; }
+  .role-text p { font-size: 14px; color: var(--muted); margin: 0; line-height: 1.6; }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 36px 48px;
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-left { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .footer-nav { display: flex; gap: 20px; flex-wrap: wrap; }
+  .footer-link { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--pink); text-decoration: none; letter-spacing: 0.06em; }
+  .footer-link:hover { color: var(--text); }
+
+  @media (max-width: 640px) {
+    .header { padding: 20px 24px; }
+    .hero { padding: 60px 24px 48px; }
+    .content { padding: 40px 24px 60px; }
+    .partner-grid { grid-template-columns: 1fr; }
+    .trusted-grid { grid-template-columns: 1fr 1fr; }
+    .stats-row { flex-direction: column; }
+    .footer { padding: 28px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <span class="header-brand">YAKK Studios</span>
+  <span class="header-meta">SCROLL #010 · PARTNERSHIP BRIEF · STAKE+STREAM</span>
+</header>
+
+<!-- Hero -->
+<div class="hero-wrap">
+  <div class="hero-glow"></div>
+  <div class="hero">
+    <span class="scroll-number">SCROLL #010 / 020</span>
+    <div class="hero-tagline">DEVELOPER PARTNERSHIP DOCUMENT</div>
+    <h1 class="hero-title">The StakePoint &amp; StreamLock Partnership</h1>
+    <p class="subtitle">Why these two tokens are on the YST Trusted List. What they do inside the YAKK ecosystem. What the architecture looks like. And what we build together from here.</p>
+    <div class="hero-divider"></div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="content">
+
+  <p class="lead">SPT and LOCK are not just tokens listed on a screener. They are integral to how YAKK generates revenue, enforces trust, and delivers value to holders. If you're building for StakePoint or StreamLock and integrating with YAKK Studios — this document is your complete context.</p>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-val cyan">$SPT</div>
+      <div class="stat-lbl">StakePoint Token</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val gold">$LOCK</div>
+      <div class="stat-lbl">StreamLock Token</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val pink">30%</div>
+      <div class="stat-lbl">Tax Share to Stakers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val green">YST ✓</div>
+      <div class="stat-lbl">Trusted List Status</div>
+    </div>
+  </div>
+
+  <h2>The Two Partners</h2>
+
+  <p>Both StakePoint and StreamLock were added to the YST Trusted List on March 28, 2026 — the same cleanup sprint that removed BONK, JTO, MICHI, and Peaky Sol for extraction patterns. The Trusted List is not charity. Tokens earn the YST ✓ badge by surviving the Cabal Detection Engine. SPT and LOCK passed.</p>
+
+  <div class="partner-grid">
+    <div class="partner-card partner-card-spt">
+      <div class="partner-ticker partner-ticker-spt">$SPT</div>
+      <div class="partner-name">StakePoint</div>
+      <div class="partner-desc">Solana-native staking infrastructure. SPT stakers receive 30% of every 5% YAKK transaction tax — the primary reward mechanism for long-term holders. StakePoint provides the locker contracts that enforce vesting and holding commitments on-chain.</div>
+      <div class="partner-mint-label">Mint Address</div>
+      <div class="partner-mint">6uUU2z5GBasaxnkcqiQVHa2SXL68mAXDsq1zYN5Qxrm7</div>
+    </div>
+    <div class="partner-card partner-card-lock">
+      <div class="partner-ticker partner-ticker-lock">$LOCK</div>
+      <div class="partner-name">StreamLock</div>
+      <div class="partner-desc">Token locking and vesting infrastructure on Solana. StreamLock enforces supply discipline across the Trusted List — tokens with provably locked supply are structurally more trustworthy. LOCK is a core tool in YAKK's anti-rug verification stack.</div>
+      <div class="partner-mint-label">Mint Address</div>
+      <div class="partner-mint">FNhcY1cwQvQqaM8CUjXSuoGKJniwC4maBRLqNRLipump</div>
+    </div>
+  </div>
+
+  <h2>Confirmed Token Addresses</h2>
+
+  <p>These are the production addresses used in the live codebase — in <code style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:12px">lib/constants.ts</code>, the Screener, and the Terminal. Do not substitute or alias these addresses in your integration code.</p>
+
+  <div class="addr-block">
+<span class="label">$SPT — StakePoint</span>
+Mint:     <span class="addr">6uUU2z5GBasaxnkcqiQVHa2SXL68mAXDsq1zYN5Qxrm7</span>
+Pair:     <span class="addr">A1d4sAmgi4Njnodmc289HP7TaPxw54n4Ey3LRDfrBvo5</span>
+Logo:     <span class="addr">/public/spt-logo.jpg  (local static — no API fetch)</span>
+Banner:   <span class="addr">/public/spt-banner.jpg</span>
+
+<span class="label">$LOCK — StreamLock</span>
+Mint:     <span class="addr-gold">FNhcY1cwQvQqaM8CUjXSuoGKJniwC4maBRLqNRLipump</span>
+Pair:     <span class="addr-gold">BSGLNWFGMrVm1K7skYpDNkywZLG1tYdTfn44ZAq3Pw2M</span>
+Logo:     <span class="addr-gold">/public/lock-logo.jpg  (local static — no API fetch)</span>
+Banner:   <span class="addr-gold">/public/lock-banner.jpg</span>
+
+<span class="label">$YST — YAKK Studios (primary token)</span>
+Mint:     <span class="addr">jYwmSavfx69a35JEkpyrxu9JUjvswEvfnhLCDV9vREV</span>
+Pool:     <span class="addr">FhVo3mqL8PW5pH5U2CN4XE33DokiyZnUwuGpH2hmHLuM</span></div>
+
+  <div class="info-card-pink">
+    <div class="info-card-label">⚠ Logo Rule</div>
+    <p>DexScreener does not return <code style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:12px">imageUrl</code> for new tokens including SPT and LOCK. All logos and banners are local static files in <code style="color:var(--gold);font-family:'Space Mono',monospace;font-size:12px">/public/</code>. Never attempt to fetch them from DexScreener or any external URL. If your integration needs to display these logos, reference the static paths above.</p>
+  </div>
+
+  <h2>The YST Trusted List</h2>
+
+  <p>The Trusted List is the curated set of tokens that appear in the YAKK Screener and Terminal. Getting on the list requires passing the Cabal Detection Engine — Gini coefficient, holder distribution, LP lock status, exit asymmetry scoring. There is no pay-to-list. There are no partnerships that bypass the forensics.</p>
+
+  <div class="trusted-grid">
+    <div class="trusted-card">
+      <div class="trusted-ticker">$YST</div>
+      <div class="trusted-name">YAKK Studios</div>
+      <div class="trusted-badge"><span class="badge b-green">Native</span></div>
+    </div>
+    <div class="trusted-card">
+      <div class="trusted-ticker">$SPT</div>
+      <div class="trusted-name">StakePoint</div>
+      <div class="trusted-badge"><span class="badge b-cyan">Partner</span></div>
+    </div>
+    <div class="trusted-card">
+      <div class="trusted-ticker">$LOCK</div>
+      <div class="trusted-name">StreamLock</div>
+      <div class="trusted-badge"><span class="badge b-gold">Partner</span></div>
+    </div>
+    <div class="trusted-card">
+      <div class="trusted-ticker">$SOL</div>
+      <div class="trusted-name">Solana</div>
+      <div class="trusted-badge"><span class="badge b-green">Native</span></div>
+    </div>
+    <div class="trusted-card">
+      <div class="trusted-ticker">$WIF</div>
+      <div class="trusted-name">dogwifhat</div>
+      <div class="trusted-badge"><span class="badge b-green">Trusted</span></div>
+    </div>
+    <div class="trusted-card" style="opacity:0.35;">
+      <div class="trusted-ticker" style="font-size:14px;color:var(--muted)">REMOVED</div>
+      <div class="trusted-name">BONK / JTO / MICHI</div>
+      <div class="trusted-badge"><span class="badge" style="background:rgba(239,68,68,0.1);color:var(--red);border-color:rgba(239,68,68,0.2)">Extraction</span></div>
+    </div>
+  </div>
+
+  <h2>How the 5% Tax Flows</h2>
+
+  <p>Every $YST transaction carries a 5% tax. The split is hardcoded — not configurable, not adjustable by any admin key. StakePoint stakers receive 30% of that 5% automatically. This is the primary yield mechanism for long-term holders.</p>
+
+  <div class="tax-flow">
+    <div class="tax-flow-title">$YST Transaction Tax Distribution</div>
+
+    <div class="tax-row">
+      <div class="tax-pct" style="color:var(--cyan)">30%</div>
+      <div class="tax-bar-wrap"><div class="tax-bar" style="width:100%;background:var(--cyan)"></div></div>
+      <div class="tax-info">
+        <div class="tax-dest">StakePoint Stakers</div>
+        <div class="tax-note">SPT stakers receive direct yield from every YST transaction</div>
+      </div>
+    </div>
+
+    <div class="tax-row">
+      <div class="tax-pct" style="color:var(--pink)">30%</div>
+      <div class="tax-bar-wrap"><div class="tax-bar" style="width:100%;background:var(--pink)"></div></div>
+      <div class="tax-info">
+        <div class="tax-dest">Holder Cashback</div>
+        <div class="tax-note">Distributed back to $YST holders as cashback rewards</div>
+      </div>
+    </div>
+
+    <div class="tax-row">
+      <div class="tax-pct" style="color:var(--red)">20%</div>
+      <div class="tax-bar-wrap"><div class="tax-bar" style="width:66%;background:var(--red)"></div></div>
+      <div class="tax-info">
+        <div class="tax-dest">Auto-Burn</div>
+        <div class="tax-note">Permanently removed from supply on every transaction</div>
+      </div>
+    </div>
+
+    <div class="tax-row">
+      <div class="tax-pct" style="color:var(--gold)">20%</div>
+      <div class="tax-bar-wrap"><div class="tax-bar" style="width:66%;background:var(--gold)"></div></div>
+      <div class="tax-info">
+        <div class="tax-dest">Treasury</div>
+        <div class="tax-note">Platform operations, development, Saving the Wren fund</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pull-quote">
+    <p>"SPT stakers don't just hold a token. They hold a stake in every transaction that flows through the YAKK ecosystem — automatically, on-chain, no claim required."</p>
+  </div>
+
+  <h2>What Each Partner Does in the dApp</h2>
+
+  <div class="role-row">
+    <div class="role-icon role-icon-spt">📊</div>
+    <div class="role-text">
+      <h4>StakePoint — The Yield Layer</h4>
+      <p>The <code style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:11px">StakePoint.tsx</code> section is a public section (no $YST gate) — anyone can see staking data. The section calls the <code style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:11px">/api/stakepoint</code> proxy route which forwards to <code style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:11px">stakepoint.app/api/</code> to avoid CORS. It surfaces lock data, pool stats, and staking stats for the SPT mint address. The proxy accepts a <code style="color:var(--gold);font-family:'Space Mono',monospace;font-size:11px">type</code> param: <code style="color:var(--gold);font-family:'Space Mono',monospace;font-size:11px">locks</code> | <code style="color:var(--gold);font-family:'Space Mono',monospace;font-size:11px">pool</code> | <code style="color:var(--gold);font-family:'Space Mono',monospace;font-size:11px">stats</code>.</p>
+    </div>
+  </div>
+
+  <div class="role-row">
+    <div class="role-icon role-icon-lock">🔐</div>
+    <div class="role-text">
+      <h4>StreamLock — The Supply Integrity Layer</h4>
+      <p>LOCK's role is structural. It provides the locker infrastructure that the YAKK Cabal Detection Engine references when scoring tokens on the Trusted List. A token with provably locked liquidity via StreamLock scores better on the LP Lock dimension of the Cabal score. LOCK itself appears in the Screener and Terminal alongside YST, SPT, and SOL — surfacing real-time price data via DexScreener pair <code style="color:var(--gold);font-family:'Space Mono',monospace;font-size:11px">BSGLNWFGMrVm1K7skYpDNkywZLG1tYdTfn44ZAq3Pw2M</code>.</p>
+    </div>
+  </div>
+
+  <h2>The Integration Architecture</h2>
+
+  <table class="int-table">
+    <thead>
+      <tr>
+        <th>Route / File</th>
+        <th>Purpose</th>
+        <th>Your Integration Point?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>/api/stakepoint</td>
+        <td>CORS-safe proxy to StakePoint API. Accepts mint + type params. Returns JSON from stakepoint.app.</td>
+        <td>Yes — if you extend StakePoint section</td>
+      </tr>
+      <tr>
+        <td>/api/screener</td>
+        <td>Returns live prices for all Trusted List tokens including SPT + LOCK. 30s in-memory TTL.</td>
+        <td>Yes — Screener + Terminal both read from here</td>
+      </tr>
+      <tr>
+        <td>StakePoint.tsx</td>
+        <td>Public section. Displays SPT staking data. No gate. All holders can see it.</td>
+        <td>Yes — add UI for new staking features here</td>
+      </tr>
+      <tr>
+        <td>Screener.tsx</td>
+        <td>Gated (250K YST). SPT + LOCK appear in the 5-token Trusted filter. Chart header shows banner.</td>
+        <td>Readonly — add tokens via constants.ts only</td>
+      </tr>
+      <tr>
+        <td>Terminal.tsx</td>
+        <td>Gated (250K YST). Full trading terminal. LOCK pair fetched live from /api/screener for chart embed.</td>
+        <td>Readonly — pair address updated via screener API</td>
+      </tr>
+      <tr>
+        <td>lib/constants.ts</td>
+        <td>Trusted List configuration. Mint addresses, pair addresses, logo paths, display names.</td>
+        <td>Yes — add/edit token config here only</td>
+      </tr>
+      <tr>
+        <td>public/</td>
+        <td>Static logo and banner assets. spt-logo.jpg, lock-logo.jpg, spt-banner.jpg, lock-banner.jpg.</td>
+        <td>Yes — add any new visual assets here</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>The StakePoint API Proxy — How It Works</h2>
+
+  <div class="code-block"><span class="cm">// /api/stakepoint — CORS-safe proxy to StakePoint API
+// Usage: GET /api/stakepoint?mint={mintAddress}&type={locks|pool|stats}</span>
+
+<span class="cm">// Three endpoint types available:</span>
+<span class="kw">const</span> endpointMap = {
+  locks: <span class="str">`https://stakepoint.app/api/locks/${mint}`</span>,
+  pool:  <span class="str">`https://stakepoint.app/api/pools/${mint}`</span>,
+  stats: <span class="str">`https://stakepoint.app/api/stats/${mint}`</span>,
+};
+
+<span class="cm">// Mint address for SPT staking queries:</span>
+<span class="cm">// 6uUU2z5GBasaxnkcqiQVHa2SXL68mAXDsq1zYN5Qxrm7</span>
+
+<span class="cm">// Example call from StakePoint.tsx:</span>
+<span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'/api/stakepoint?mint=6uUU2z5...&type=stats'</span>);
+<span class="kw">const</span> data = <span class="kw">await</span> res.json();
+
+<span class="cm">// Response is passed through from StakePoint's API verbatim</span>
+<span class="cm">// Validate against upstream schema before rendering</span></div>
+
+  <h2>The LOCK Chart — Pair Address Fetching</h2>
+
+  <p>The LOCK trading chart in the Screener and Terminal uses TradingView via a DexScreener embed. The pair address is not hardcoded — it is fetched live from <code style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:12px">/api/screener</code> on component mount. This was a critical fix made on 2026-04-05 after the chart was breaking because the mint address was being used in the <code style="color:var(--gold);font-family:'Space Mono',monospace;font-size:12px">dex</code> field instead of the pair address.</p>
+
+  <div class="info-card">
+    <div class="info-card-label">🔑 DexScreener Embed Rule</div>
+    <p>The DexScreener/TradingView embed requires the <strong>pair address</strong> in the URL — not the mint address. The current live pair for LOCK is <code style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:12px">BSGLNWFGMrVm1K7skYpDNkywZLG1tYdTfn44ZAq3Pw2M</code>. Pair addresses can change if liquidity migrates — always fetch live from <code style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:12px">/api/screener</code>. Never hardcode. Never use the mint address as a substitute. Additionally: never add a <code style="color:var(--gold);font-family:'Space Mono',monospace;font-size:12px">sandbox</code> attribute to the iframe — TradingView requires web workers and cross-origin storage access that the sandbox attribute blocks silently.</p>
+  </div>
+
+  <h2>What Gets Built Next</h2>
+
+  <p>The StakePoint and StreamLock partnerships are in their first phase. The integration is live — both tokens appear in the Screener and Terminal, StakePoint has its own section, and the staking reward mechanism is architecturally wired. Phase 2 is where it gets interesting.</p>
+
+  <div class="role-row" style="margin-top:24px;">
+    <div class="role-icon role-icon-spt">📈</div>
+    <div class="role-text">
+      <h4>StakePoint Phase 2 — Live Staking Dashboard</h4>
+      <p>Wire real-time APY, total value locked, and individual position tracking into <code style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:11px">StakePoint.tsx</code>. The proxy is already in place. The section just needs UI wired to live data. The goal: holders see their staking position and real-time $YST tax income from a single screen.</p>
+    </div>
+  </div>
+
+  <div class="role-row">
+    <div class="role-icon role-icon-lock">🔏</div>
+    <div class="role-text">
+      <h4>StreamLock Phase 2 — Trusted List LP Lock Verification</h4>
+      <p>Feed StreamLock lock data directly into the Cabal Detection Engine's LP Lock scoring dimension. If a token's LP is locked via StreamLock, the Cabal score reflects it automatically. This creates a direct incentive loop: projects that use LOCK infrastructure score cleaner on YAKK's forensics.</p>
+    </div>
+  </div>
+
+  <div class="role-row">
+    <div class="role-icon" style="background:rgba(192,38,255,0.1);border:1px solid rgba(192,38,255,0.2);">🤖</div>
+    <div class="role-text">
+      <h4>YAKK Ventures — Launchpad Integration</h4>
+      <p>Tokens launching through the YAKK Ventures launchpad will be required to lock LP via StreamLock and structure team token vesting via StakePoint. This makes both partners structural requirements for any verified launch — not optional add-ons.</p>
+    </div>
+  </div>
+
+  <div class="role-row">
+    <div class="role-icon" style="background:rgba(247,201,72,0.08);border:1px solid rgba(247,201,72,0.2);">📡</div>
+    <div class="role-text">
+      <h4>n8n Automation Layer</h4>
+      <p>Phase 2 automation will wire whale alerts and staking events from StakePoint into the YAKK whale feed via n8n. When a large SPT staking position opens or closes, the signal flows into the platform's alert system — giving YST holders early visibility into staking sentiment shifts.</p>
+    </div>
+  </div>
+
+  <h2>Security Considerations for Integration Work</h2>
+
+  <div class="info-card-cyan">
+    <div class="info-card-label">Integration Security Checklist</div>
+    <p>Before shipping any StakePoint or StreamLock integration code, verify: (1) All API calls go through the proxy route — never call <code style="color:var(--gold);font-family:'Space Mono',monospace;font-size:12px">stakepoint.app</code> directly from client-side code (CORS will block it). (2) Staking amounts and positions are display-only — no write operations that move tokens can be initiated without explicit wallet confirmation via Solana Wallet Adapter. (3) Lock data displayed in the Trusted List or Cabal score is treated as advisory — it reflects on-chain state at fetch time and should be clearly timestamped. (4) Never hardcode pair addresses — always fetch live from <code style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:12px">/api/screener</code>.</p>
+  </div>
+
+  <!-- Final callout -->
+  <div class="callout-final">
+    <div class="callout-final-eyebrow">You've Read All Ten Scrolls</div>
+    <h3>You Now Know the Empire</h3>
+    <p>These scrolls are your complete technical and strategic context for the YAKK Studios ecosystem. The mission, the council, the cabal engine, the tokenomics, the dApp, the partnership. Everything that exists was built by one person in three months. Now you know exactly what you're plugging into.</p>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="footer-left">
+    YAKK Studios · Alexandria Archive<br>
+    <span style="opacity:0.5">Scroll #010 · StakePoint &amp; StreamLock · Final Scroll · April 2026</span>
+  </div>
+  <nav class="footer-nav">
+    <a class="footer-link" href="scroll-009.html">← Scroll #009</a>
+    <a class="footer-link" href="index.html">↑ Index</a>
+    <a class="footer-link" href="scroll-011.html">Scroll #011 →</a>
+  </nav>
+</div>
+
+</body>
+</html>
