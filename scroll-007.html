@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scroll #007 — The Cabal Detection Engine | YAKK Studios</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0A0A0F;
+    --bg2: #0f0f18;
+    --pink: #e0607e;
+    --gold: #f7c948;
+    --purple: #C026FF;
+    --cyan: #00D4FF;
+    --green: #22c55e;
+    --red: #ef4444;
+    --text: #f5f5f7;
+    --muted: #8a8a9a;
+    --border: rgba(0,212,255,0.12);
+    --border-gold: rgba(247,201,72,0.15);
+    --border-pink: rgba(224,96,126,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 17px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 28px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(16px);
+    z-index: 100;
+  }
+
+  .header-brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pink); }
+  .header-meta { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; opacity: 0.6; }
+
+  .hero-wrap { position: relative; overflow: hidden; border-bottom: 1px solid var(--border); }
+
+  .hero-glow {
+    position: absolute; top: -120px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(192,38,255,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero { max-width: 760px; margin: 0 auto; padding: 88px 48px 72px; position: relative; }
+
+  .scroll-number { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--pink); text-transform: uppercase; display: block; margin-bottom: 24px; opacity: 0.8; }
+
+  .hero-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(40px, 6vw, 68px); line-height: 1.05; color: var(--text); margin-bottom: 28px; }
+
+  .hero-tagline { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 0.15em; color: var(--gold); text-transform: uppercase; margin-bottom: 20px; opacity: 0.9; }
+
+  .subtitle { font-size: 18px; color: var(--muted); line-height: 1.65; max-width: 580px; }
+  .hero-divider { width: 48px; height: 2px; background: linear-gradient(90deg, var(--purple), transparent); margin-top: 40px; }
+
+  .content { max-width: 760px; margin: 0 auto; padding: 64px 48px 80px; }
+  .content p { margin-bottom: 24px; color: var(--muted); }
+  .content p:last-child { margin-bottom: 0; }
+  .lead { font-size: 20px; color: var(--text) !important; line-height: 1.65; margin-bottom: 32px !important; }
+
+  .content h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px; color: var(--text); margin: 56px 0 20px; line-height: 1.2; }
+  .content h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; color: var(--text); margin: 32px 0 12px; }
+
+  .g { color: var(--gold); }
+  .p { color: var(--pink); }
+  .c { color: var(--cyan); }
+  .pu { color: var(--purple); }
+
+  .pull-quote { border-left: 3px solid var(--purple); padding: 20px 28px; margin: 40px 0; background: rgba(192,38,255,0.05); border-radius: 0 8px 8px 0; }
+  .pull-quote p { font-size: 18px; font-style: italic; color: var(--text) !important; margin: 0 !important; line-height: 1.6; }
+
+  .dimension-list { margin: 36px 0; display: flex; flex-direction: column; gap: 16px; }
+
+  .dim-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .dim-weight {
+    text-align: center;
+    padding-top: 4px;
+  }
+
+  .dim-pct {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: var(--pink);
+    display: block;
+    line-height: 1;
+  }
+
+  .dim-pct-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: block;
+    margin-top: 4px;
+  }
+
+  .dim-body {}
+  .dim-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 8px; }
+  .dim-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  .score-bands {
+    margin: 36px 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .band-row {
+    display: grid;
+    grid-template-columns: 120px 60px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .band-row:last-child { border-bottom: none; }
+
+  .band-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; }
+  .band-score { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); }
+  .band-desc { font-size: 13px; color: var(--muted); }
+  .band-action { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; white-space: nowrap; }
+
+  .band-clean { color: var(--green); }
+  .band-clean .band-action { background: rgba(34,197,94,0.12); color: var(--green); }
+
+  .band-risky { color: var(--gold); }
+  .band-risky .band-action { background: rgba(247,201,72,0.12); color: var(--gold); }
+
+  .band-active { color: var(--pink); }
+  .band-active .band-action { background: rgba(224,96,126,0.12); color: var(--pink); }
+
+  .band-clown { color: var(--red); }
+  .band-clown .band-action { background: rgba(239,68,68,0.12); color: var(--red); }
+
+  .pipeline-steps {
+    margin: 36px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .pipe-step {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pipe-step:last-child { border-bottom: none; }
+
+  .pipe-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--purple);
+    min-width: 36px;
+    padding-top: 3px;
+  }
+
+  .pipe-body {}
+  .pipe-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 6px; }
+  .pipe-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  .callout {
+    background: rgba(224,96,126,0.07);
+    border: 1px solid rgba(224,96,126,0.2);
+    border-radius: 12px;
+    padding: 32px 36px;
+    margin: 48px 0;
+  }
+
+  .callout h3 { color: var(--pink); margin-top: 0; margin-bottom: 12px; font-size: 16px; letter-spacing: 0.04em; font-family: 'Syne', sans-serif; font-weight: 700; }
+  .callout p { margin: 0 !important; font-size: 15px; }
+
+  .data-tag { display: inline-block; font-family: 'Space Mono', monospace; font-size: 11px; background: rgba(0,212,255,0.08); color: var(--cyan); border: 1px solid rgba(0,212,255,0.2); border-radius: 4px; padding: 2px 8px; margin: 2px 3px; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+  .arch-table {
+    margin: 32px 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .arch-row-table {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .arch-row-table:last-child { border-bottom: none; }
+
+  .arch-row-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text);
+    padding: 16px 20px;
+    background: rgba(192,38,255,0.04);
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+
+  .arch-row-desc {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 16px 20px;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+  }
+
+  .heuristic-list { margin: 32px 0; display: flex; flex-direction: column; gap: 12px; }
+
+  .heuristic-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .h-id {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--pink);
+    letter-spacing: 0.08em;
+    padding-top: 2px;
+  }
+
+  .h-body {}
+  .h-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 6px; }
+  .h-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  .severity-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    height: fit-content;
+  }
+
+  .sev-critical { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+  .sev-high { background: rgba(224,96,126,0.12); color: var(--pink); border: 1px solid rgba(224,96,126,0.25); }
+  .sev-medium { background: rgba(247,201,72,0.12); color: var(--gold); border: 1px solid rgba(247,201,72,0.25); }
+
+  .code-block {
+    background: #07070f;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px 32px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin: 28px 0;
+    color: var(--muted);
+  }
+
+  .code-kw { color: var(--cyan); }
+  .code-type { color: var(--gold); }
+  .code-comment { color: #444455; }
+  .code-str { color: #a78bfa; }
+
+  .callout-purple {
+    background: rgba(192,38,255,0.06);
+    border: 1px solid rgba(192,38,255,0.2);
+    border-radius: 12px;
+    padding: 32px 36px;
+    margin: 48px 0;
+  }
+
+  .callout-purple h3 { color: var(--purple); margin-top: 0; margin-bottom: 12px; font-size: 16px; letter-spacing: 0.04em; font-family: 'Syne', sans-serif; font-weight: 700; }
+  .callout-purple p { margin: 0 !important; font-size: 15px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">YAKK Studios · Digital Scrolls</div>
+  <div class="header-meta">SCROLL #007 · PARTNER BRIEF · APRIL 2026</div>
+</header>
+
+<div class="hero-wrap">
+  <div class="hero-glow"></div>
+  <div class="hero">
+    <span class="scroll-number">DIGITAL SCROLL · 007 · PARTNER BRIEF</span>
+    <h1 class="hero-title">The Cabal<br>Detection Engine</h1>
+    <p class="hero-tagline">Observable behaviour · deterministic scoring · no inference</p>
+    <p class="subtitle">
+      How YAKK hunts coordinated extraction. The forensics system, the six scoring dimensions,
+      the risk bands, and the investigation pipeline that has tracked over $9.8B+ in documented cases.
+    </p>
+    <div class="hero-divider"></div>
+  </div>
+</div>
+
+<div class="content">
+
+  <p class="lead">
+    The Kaize Cabal Detection Engine turns observable on-chain and off-chain behaviour into a number.
+    Not opinion. Not reputation. Not vibes. Observable behaviour — timestamped, auditable, deterministic.
+    This is the core of what YAKK builds, and why the platform exists.
+  </p>
+
+  <p>
+    A KOL who promoted 7 tokens that later rugpulled — that is a fact.
+    A wallet that loaded a position 47 minutes before a shill post — that is a fact.
+    A post that ended with "DYOR NFA" as the only disclaimer for a paid promotion — that is a fact.
+    The engine collects those facts, weights them by how directly they predict retail harm,
+    and produces a score. No guesswork. No inference. No naming someone a criminal based on vibes.
+  </p>
+
+  <div class="pull-quote">
+    <p>"Accountability without evidence is slander. Evidence without accountability is cowardice. This system is neither."</p>
+  </div>
+
+  <h2>The Six <span class="pu">Scoring Dimensions</span></h2>
+
+  <p>
+    The Kaize Cabal Risk Index is built from six independently observable signal types,
+    each weighted by how directly they correlate with documented retail harm.
+    Total weight sums to 100%.
+  </p>
+
+  <div class="dimension-list">
+
+    <div class="dim-card">
+      <div class="dim-weight">
+        <span class="dim-pct">28%</span>
+        <span class="dim-pct-label">Weight</span>
+      </div>
+      <div class="dim-body">
+        <div class="dim-name">01 — Rug Association Frequency</div>
+        <div class="dim-desc">The most important dimension — the most direct measure of harm already done. If a KOL promoted 12 tokens and 7 later appeared in the rug ledger, that is a pattern. Tokens are classified as rugs using structural criteria only: LP removed, dev wallet dumped, mint authority not renounced. Price decline alone is not sufficient. Binary, deterministic, auditable.</div>
+      </div>
+    </div>
+
+    <div class="dim-card">
+      <div class="dim-weight">
+        <span class="dim-pct">25%</span>
+        <span class="dim-pct-label">Weight</span>
+      </div>
+      <div class="dim-body">
+        <div class="dim-name">02 — Exit Asymmetry</div>
+        <div class="dim-desc">Did the person promoting the token profit while their followers lost? Three signals tracked: entry timing (did the wallet buy before the promo post?), exit timing (did they sell near ATH while the post was still getting engagement?), and follower loss correlation (statistical relationship between their exit and community wallet drawdown). Extraction scoring from observable wallet behaviour.</div>
+      </div>
+    </div>
+
+    <div class="dim-card">
+      <div class="dim-weight">
+        <span class="dim-pct">18%</span>
+        <span class="dim-pct-label">Weight</span>
+      </div>
+      <div class="dim-body">
+        <div class="dim-name">03 — Structural Exploitation</div>
+        <div class="dim-desc">Not all promotions carry equal harm potential. This dimension scores the mechanism being promoted, not just the outcome. Pump.fun bonding curves, "fair launches" where dev wallets loaded pre-announcement, coordinated multi-KOL launches timed within minutes, and repeated use of identical shill templates across different tokens — all scored. Pattern recognition, not outcome analysis.</div>
+      </div>
+    </div>
+
+    <div class="dim-card">
+      <div class="dim-weight">
+        <span class="dim-pct">15%</span>
+        <span class="dim-pct-label">Weight</span>
+      </div>
+      <div class="dim-body">
+        <div class="dim-name">04 — Disclosure Honesty</div>
+        <div class="dim-desc">Under UK FCA rules, any financial promotion — including social media posts promoting cryptoassets to UK audiences — requires clear, fair, and not misleading disclosure. "DYOR NFA" is not a disclosure. It is a shield. This dimension measures the ratio of paid posts to disclosed posts. The ratio is the score. Binary and auditable.</div>
+      </div>
+    </div>
+
+    <div class="dim-card">
+      <div class="dim-weight">
+        <span class="dim-pct">7%</span>
+        <span class="dim-pct-label">Weight</span>
+      </div>
+      <div class="dim-body">
+        <div class="dim-name">05 — Network Clustering</div>
+        <div class="dim-desc">Graph analysis of wallet transaction history. Specifically: does this wallet repeatedly transact with addresses in YAKK's Cabal Wallet Registry? A single shared transaction with a flagged wallet is an info signal. Multiple co-transactions across multiple launches, combined with high scores on other dimensions, becomes evidence of embedded network membership. Not guilt by association — structural proximity scoring.</div>
+      </div>
+    </div>
+
+    <div class="dim-card">
+      <div class="dim-weight">
+        <span class="dim-pct">7%</span>
+        <span class="dim-pct-label">Weight</span>
+      </div>
+      <div class="dim-body">
+        <div class="dim-name">06 — Regulatory Proximity</div>
+        <div class="dim-desc">KOLs operating from lighter-regulation jurisdictions while deliberately targeting UK or EU audiences with non-compliant promotions are engaged in regulatory arbitrage. Weighted lower because harder to evidence than on-chain behaviour — but material when combined with high scores in other dimensions. Adds contextual weight, not primary scoring.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2>The Score <span class="g">Bands</span></h2>
+
+  <p>Every entity scored by the engine lands in one of four bands. Each band carries a defined YAKK platform response.</p>
+
+  <div class="score-bands">
+    <div class="band-row band-clean">
+      <div class="band-label">CLEAN</div>
+      <div class="band-score">0–20</div>
+      <div class="band-desc">No significant pattern of harm detected. Monitor passively.</div>
+      <div class="band-action">Green badge</div>
+    </div>
+    <div class="band-row band-risky">
+      <div class="band-label">RISKY PROMOTER</div>
+      <div class="band-score">21–50</div>
+      <div class="band-desc">Mixed signals. Some rug exposure, disclosure gaps, or structural concerns.</div>
+      <div class="band-action">Yellow warning</div>
+    </div>
+    <div class="band-row band-active">
+      <div class="band-label">ACTIVE CABAL</div>
+      <div class="band-score">51–74</div>
+      <div class="band-desc">Clear pattern of asymmetric extraction. Content suppressed. Referral links stripped.</div>
+      <div class="band-action">Pink badge · Void Mode</div>
+    </div>
+    <div class="band-row band-clown">
+      <div class="band-label">CERTIFIED CLOWN</div>
+      <div class="band-score">75–100</div>
+      <div class="band-desc">Systematic, repeated, evidenced exploitation. Permanent registry listing.</div>
+      <div class="band-action">Full report published</div>
+    </div>
+  </div>
+
+  <h2>The Investigation <span class="p">Pipeline</span></h2>
+
+  <p>
+    Every cabal investigation follows a structured pipeline. The six specialist models of the
+    Original Six council (Kaize, Morra, Zephyr, Riven, Sable, Mnemos) each own a stage of the process.
+  </p>
+
+  <div class="pipeline-steps">
+    <div class="pipe-step">
+      <div class="pipe-num">01</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Signal Ingestion — Zephyr</div>
+        <div class="pipe-desc">Real-time social and on-chain monitoring. GeckoTerminal pool data cross-referenced with live X cashtag sentiment. Influencer coordination window mapping (≥5 Tier-2 influencers, same hashtag, within 15-minute window). Hard 1500ms timeout — pipeline continues without social context if exceeded.</div>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">02</div>
+      <div class="pipe-body">
+        <div class="pipe-title">FeatureVector Extraction — Sable</div>
+        <div class="pipe-desc">Dual-mode engine. Mode A extracts 8-dimensional on-chain signals from Helius RPC: <span class="data-tag">gini_coefficient</span> <span class="data-tag">holder_count</span> <span class="data-tag">sniper_density</span> <span class="data-tag">lp_lock_pct</span> <span class="data-tag">dev_wallet_pct</span> <span class="data-tag">tx_velocity</span> <span class="data-tag">mint_authority</span> <span class="data-tag">freeze_authority</span>. Mode B maps to deterministic risk bands. Strips benign heavy-hitters (CEX wallets, known market makers) before scoring.</div>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">03</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Historical Analog Retrieval — Mnemos</div>
+        <div class="pipe-desc">Alexandria Archive search for historical patterns matching the current FeatureVector signature. Top 3 analog matches returned with extraction amounts, pattern type, and outcome. Repeat wallet address detection. MEMMA freshness loop verifies record validity before retrieval.</div>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">04</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Synthesis & Scoring — Kaize</div>
+        <div class="pipe-desc">Sovereign orchestrator. Ingests all specialist outputs, applies Hybrid Symmetry Scoring across the six dimensions, runs the MEMMA verification loop, and issues the final Cabal Risk Index score with confidence rating and evidence summary. 40% of vote weight. Issues final Intelligence Report.</div>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">05</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Adversarial Red-Team — Riven</div>
+        <div class="pipe-desc">Staged review. Stage 1: silent monitoring of the council output, anomaly accumulation. Stage 2: full adversarial review — volume spoofing audit, Jaccard trap check, Nash-equilibrium attack search. Holds veto power over Kaize's final score. If Riven vetoes, Morra escalates.</div>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">06</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Escalation — Morra</div>
+        <div class="pipe-desc">Dormant by default. Activates on council deadlock or when Riven vetoes the primary score. Multi-hop graph traversal for complex obfuscation mapping. Maintains Intrinsic Memory isolated from Kaize's conversation history. Also serves as primary artifact builder for published investigation reports.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>The Published <span class="g">Output</span></h2>
+
+  <p>
+    Every completed investigation is filed to the Alexandria Archive under a unique scroll ID (RD-XXX for rug detector outputs, CS-XXX for council-generated research). Investigations above the CERTIFIED CLOWN threshold receive a full published report — indexed in the platform's Certified Clowns registry and available to all $YST holders.
+  </p>
+
+  <p>
+    As of April 2026, 12+ investigations are filed. $9.8B+ in documented extraction events tracked across the registry.
+    The database grows with every session. Historical analogs from previous investigations are automatically
+    retrieved and applied to new cases by Mnemos — compounding investigative accuracy over time.
+  </p>
+
+  <h2>Museion <span class="pu">On-Chain Architecture</span></h2>
+
+  <p>
+    Alongside the KOL/social scoring system above, Museion runs a separate on-chain detection layer —
+    a continuous background intelligence pipeline that pulls live signals from Helius RPC,
+    normalises them through Sable's FeatureVector extractor, and compounds them across five
+    independent on-chain detectors. Borrowed from Agent-Z's open-source architecture:
+    compound independent evidence streams rather than relying on a single opaque score.
+    An alert fires only when two or more detectors independently corroborate the same anomaly pattern.
+  </p>
+
+  <div class="arch-table">
+    <div class="arch-row-table">
+      <div class="arch-row-label">Helius MCP Server</div>
+      <div class="arch-row-desc">TypeScript + Python dual-impl. Paginated getTransactionsForAddress, webhook subscriptions, raw-to-FeatureVector extraction. Exponential backoff + jitter on all RPC calls.</div>
+    </div>
+    <div class="arch-row-table">
+      <div class="arch-row-label">Sable FeatureVector</div>
+      <div class="arch-row-desc">Shannon entropy, stable wallet fingerprinting, volume envelope normalisation, trade-timing clustering. Deterministic output schema — same input always produces same vector.</div>
+    </div>
+    <div class="arch-row-table">
+      <div class="arch-row-label">Detector Stack ×5</div>
+      <div class="arch-row-desc">Pre-unlock LP rotation, OTC-shadow exits, synchronised trade fingerprinting, TWAP-masking detector, governance power concentration. Each operates independently and produces a binary flag + confidence score.</div>
+    </div>
+    <div class="arch-row-table">
+      <div class="arch-row-label">Cabal Scorer</div>
+      <div class="arch-row-desc">Composite risk score using compound OR logic — triggers only when 2+ detectors fire simultaneously. Outputs score + evidence chain + confidence band (LOW / MED / HIGH / CRITICAL).</div>
+    </div>
+    <div class="arch-row-table">
+      <div class="arch-row-label">Adversarial Review</div>
+      <div class="arch-row-desc">Kaize + Justitia council review. False-positive vs false-negative tracks separated. Human sign-off required before any public advisory is issued.</div>
+    </div>
+    <div class="arch-row-table">
+      <div class="arch-row-label">HUD Surface</div>
+      <div class="arch-row-desc">Cabal Starburst Visualiser (SSE-streamed), VAR readout, Sniper Density map. Real-time via Helius webhook → Server-Sent Events → React client.</div>
+    </div>
+  </div>
+
+  <h2>The Five <span class="p">On-Chain Heuristics</span></h2>
+
+  <p>
+    Each detector operates independently and produces a binary flag plus a confidence score.
+    The Cabal Scorer compounds them — a single detector never triggers a public alert alone.
+    Validated precision benchmarks from Flashbots research at F1=0.943 at 0.5% threshold,
+    3600s synchronisation window.
+  </p>
+
+  <div class="heuristic-list">
+    <div class="heuristic-card">
+      <div class="h-id">H-01</div>
+      <div class="h-body">
+        <div class="h-name">Pre-Unlock LP Rotation</div>
+        <div class="h-desc">Monitors insiders reducing LP, delegating tokens, or unstaking within a 72-hour window before a scheduled unlock event. Validated as the highest-precision single detector for exit orchestration. Watches for lp_delta_72h deviating below threshold relative to position size.</div>
+      </div>
+      <div class="severity-badge sev-critical">CRITICAL</div>
+    </div>
+    <div class="heuristic-card">
+      <div class="h-id">H-02</div>
+      <div class="h-body">
+        <div class="h-name">OTC-Shadow Exit</div>
+        <div class="h-desc">Detects sudden wallet-to-wallet flows between common-funded addresses that bypass DEX and CEX channels entirely. Signature of coordinated insider cash-out before public awareness. Tracked via otc_flow_usd field — spikes above baseline trigger the flag.</div>
+      </div>
+      <div class="severity-badge sev-high">HIGH</div>
+    </div>
+    <div class="heuristic-card">
+      <div class="h-id">H-03</div>
+      <div class="h-body">
+        <div class="h-name">Synchronised Trade Fingerprinting</div>
+        <div class="h-desc">Identifies 2+ addresses executing near-identical trades within a 3-second window. sync_score measures 0–1 correlation. Flashbots-validated precision F1=0.943 at 0.5% threshold, 3600s window. Deterministic — no inference required once the timing pattern fires.</div>
+      </div>
+      <div class="severity-badge sev-high">HIGH</div>
+    </div>
+    <div class="heuristic-card">
+      <div class="h-id">H-04</div>
+      <div class="h-body">
+        <div class="h-name">TWAP-Masking Detector</div>
+        <div class="h-desc">Volume envelope analysis to detect fragmented insider exits that stay individually below DEX alert thresholds but cumulatively constitute a coordinated exit. twap_mask boolean flags patterns where individual trades look organic but the cumulative envelope does not.</div>
+      </div>
+      <div class="severity-badge sev-medium">MEDIUM</div>
+    </div>
+    <div class="heuristic-card">
+      <div class="h-id">H-05</div>
+      <div class="h-body">
+        <div class="h-name">Governance Power Concentration</div>
+        <div class="h-desc">Tracks voting power centralisation preceding protocol parameter changes or "pivot" proposals. gov_power_delta measures weight change. Frequently precedes retroactive treasury redirections dressed as governance votes.</div>
+      </div>
+      <div class="severity-badge sev-medium">MEDIUM</div>
+    </div>
+  </div>
+
+  <h2>FeatureVector <span class="c">Output Schema</span></h2>
+
+  <p>
+    Sable produces a normalised FeatureVector for every wallet analysed — the deterministic
+    intermediate format that both the KOL scoring system and the Museion on-chain detector stack
+    consume. Same input, same output, every time.
+  </p>
+
+  <div class="code-block"><span class="code-comment">// Sable FeatureVector — normalised output schema (TypeScript)</span>
+<span class="code-kw">interface</span> <span class="code-type">FeatureVector</span> {
+  wallet:           <span class="code-str">string</span>;      <span class="code-comment">// base58 address</span>
+  fingerprint:      <span class="code-str">string</span>;      <span class="code-comment">// SHA-256 stable wallet hash</span>
+  entropy:          <span class="code-str">number</span>;      <span class="code-comment">// Shannon entropy of tx pattern (0–1)</span>
+  gini_coefficient: <span class="code-str">number</span>;      <span class="code-comment">// holder concentration (0–1) — &gt;0.85 = High Risk</span>
+  holder_count:     <span class="code-str">number</span>;      <span class="code-comment">// unique holders — &lt;5 = High Risk</span>
+  sniper_density:   <span class="code-str">number</span>;      <span class="code-comment">// % snipers at launch</span>
+  lp_lock_pct:      <span class="code-str">number</span>;      <span class="code-comment">// % LP locked on-chain</span>
+  dev_wallet_pct:   <span class="code-str">number</span>;      <span class="code-comment">// dev wallet % of supply</span>
+  mint_authority:   <span class="code-str">boolean</span>;     <span class="code-comment">// true = renounced</span>
+  freeze_authority: <span class="code-str">boolean</span>;     <span class="code-comment">// true = renounced</span>
+  lp_delta_72h:     <span class="code-str">number</span>;      <span class="code-comment">// LP change in 72h pre-unlock window (H-01)</span>
+  otc_flow_usd:     <span class="code-str">number</span>;      <span class="code-comment">// off-DEX wallet-to-wallet volume USD (H-02)</span>
+  sync_score:       <span class="code-str">number</span>;      <span class="code-comment">// synchronised trade correlation 0–1 (H-03)</span>
+  twap_mask:        <span class="code-str">boolean</span>;     <span class="code-comment">// fragmentation below threshold detected (H-04)</span>
+  gov_power_delta:  <span class="code-str">number</span>;      <span class="code-comment">// governance weight change (H-05)</span>
+  cabal_score:      <span class="code-str">number</span>;      <span class="code-comment">// compound composite score (0–100)</span>
+  detectors_fired:  <span class="code-str">string[]</span>;    <span class="code-comment">// heuristics triggered e.g. ['H-01','H-03']</span>
+  confidence:       <span class="code-str">'LOW' | 'MED' | 'HIGH' | 'CRITICAL'</span>;
+  evidence_hash:    <span class="code-str">string</span>;      <span class="code-comment">// SHA-256 of full evidence package</span>
+}</div>
+
+  <div class="callout-purple">
+    <h3>The Asymmetric Tolerance Principle</h3>
+    <p>
+      The detection system operates with a deliberate asymmetry: it errs toward flagging rather than silence.
+      Reducing sensitivity to eliminate false positives will silently increase false negatives —
+      and a missed cabal has vastly higher human cost than a false alert reviewed and cleared by the
+      adversarial layer. Calibration should improve the nullifier list and adversarial prompts independently,
+      never by globally lowering sensitivity thresholds.
+    </p>
+  </div>
+
+  <hr class="divider">
+
+  <div class="callout">
+    <h3>Determinism Rule — Locked In</h3>
+    <p>
+      YAKK's forensics engine operates on a strict determinism-only rule. Gini coefficient above 0.85 = High Risk.
+      Fewer than 5 holders = High Risk. These thresholds are locked in the codebase and cannot be overridden
+      by probabilistic logic, AI inference, or editorial judgment. The score is the score because the data
+      is the data. This is the rule that makes the system legally defensible and practically trustworthy.
+    </p>
+  </div>
+
+</div>
+
+<footer style="border-top: 1px solid var(--border); padding: 40px 48px;">
+  <div style="max-width: 760px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div style="font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); opacity: 0.5; letter-spacing: 1px;">
+      YAKK STUDIOS · PARTNER BRIEF · APRIL 2026
+    </div>
+    <div style="display: flex; gap: 20px;">
+      <a href="scroll-006.html" style="font-family: 'Space Mono', monospace; font-size: 11px; color: var(--cyan); opacity: 0.9; letter-spacing: 1px; text-decoration: none;">← SCROLL #006</a>
+      <a href="scroll-008.html" style="font-family: 'Space Mono', monospace; font-size: 11px; color: var(--pink); opacity: 1; letter-spacing: 1px; text-decoration: none; font-weight: 700;">SCROLL #008 →</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
