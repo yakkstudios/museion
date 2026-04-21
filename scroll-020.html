@@ -1,206 +1,21 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Scroll #020 — The Permanence Chain · Museion</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<meta http-equiv="refresh" content="0; url=/" />
+<title>Museion</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="canonical" href="https://museion.yakkstudios.xyz/" />
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --void: #050509; --surface: #0d0d14; --surface-2: #14141f;
-    --border: rgba(255,255,255,0.07);
-    --text: #f5f5f7; --text-2: rgba(245,245,247,0.68);
-    --text-3: rgba(245,245,247,0.40); --text-4: rgba(245,245,247,0.22);
-    --pink: #e0607e; --pink-dim: rgba(224,96,126,0.12);
-    --gold: #f7c948; --gold-dim: rgba(247,201,72,0.10);
-    --font-body: 'DM Sans', sans-serif; --font-head: 'Syne', sans-serif; --font-mono: 'Space Mono', monospace;
-  }
-  html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
-  body { background: var(--void); color: var(--text); font-family: var(--font-body); line-height: 1.75; min-height: 100vh; overflow-x: hidden; }
-  body::before { content: ''; position: fixed; top: -10%; left: 50%; transform: translateX(-50%); width: 900px; height: 500px; background: radial-gradient(ellipse, rgba(224,96,126,0.05) 0%, rgba(247,201,72,0.02) 40%, transparent 70%); pointer-events: none; z-index: 0; }
-  nav { position: fixed; top: 0; left: 0; right: 0; height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; background: rgba(5,5,9,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 100; }
-  .nav-brand { font-family: var(--font-head); font-size: 0.875rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); text-decoration: none; }
-  .nav-brand span { background: linear-gradient(90deg, var(--pink), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  .nav-meta { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--text-4); letter-spacing: 0.08em; text-transform: uppercase; }
-  .scroll-wrap { max-width: 720px; margin: 0 auto; padding: 120px 2rem 100px; position: relative; z-index: 1; }
-  .scroll-eyebrow { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--pink); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
-  .scroll-eyebrow::before { content: ''; display: block; width: 32px; height: 1px; background: var(--pink); opacity: 0.5; }
-  .scroll-number { font-family: var(--font-head); font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: var(--text); margin-bottom: 0.5rem; opacity: 0; animation: riseIn 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both; }
-  .scroll-title { font-family: var(--font-head); font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 600; color: var(--text-2); margin-bottom: 1rem; letter-spacing: -0.02em; opacity: 0; animation: riseIn 0.9s cubic-bezier(0.16,1,0.3,1) 0.2s both; }
-  .scroll-sub { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-4); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 3rem; opacity: 0; animation: riseIn 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s both; }
-  .rule { border: none; border-top: 1px solid var(--border); margin: 3rem 0; }
-  .lede { background: linear-gradient(135deg, rgba(224,96,126,0.08) 0%, rgba(247,201,72,0.06) 100%); border: 1px solid rgba(224,96,126,0.2); border-radius: 14px; padding: 1.75rem 2rem; margin-bottom: 3rem; font-size: 1.125rem; color: var(--text); line-height: 1.65; font-weight: 500; text-align: center; opacity: 0; animation: riseIn 0.9s cubic-bezier(0.16,1,0.3,1) 0.4s both; }
-  .body-copy { opacity: 0; animation: riseIn 0.9s cubic-bezier(0.16,1,0.3,1) 0.5s both; }
-  .body-copy p { color: var(--text-2); margin-bottom: 1.5rem; font-size: 1.0625rem; line-height: 1.8; }
-  blockquote { border-left: 2px solid var(--pink); padding: 1rem 1.5rem; margin: 2.5rem 0; color: var(--text-3); font-style: italic; font-size: 1.125rem; line-height: 1.7; }
-  blockquote em { font-style: normal; color: var(--pink); }
-  h2 { font-family: var(--font-head); font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text); margin: 3.5rem 0 1.25rem; }
-
-  /* Roadmap timeline */
-  .roadmap { margin: 1.75rem 0; display: flex; flex-direction: column; gap: 0; }
-  .roadmap-item { display: flex; gap: 1.25rem; padding-bottom: 1.5rem; position: relative; }
-  .roadmap-item:last-child { padding-bottom: 0; }
-  .roadmap-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-  .roadmap-dot { width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(135deg, var(--pink), var(--gold)); flex-shrink: 0; margin-top: 6px; box-shadow: 0 0 0 3px rgba(224,96,126,0.15); }
-  .roadmap-line { width: 1px; flex: 1; background: var(--border); margin-top: 8px; }
-  .roadmap-item:last-child .roadmap-line { display: none; }
-  .roadmap-qtr { font-family: var(--font-mono); font-size: 0.625rem; color: var(--gold); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.35rem; }
-  .roadmap-title { font-family: var(--font-head); font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.4rem; }
-  .roadmap-body { font-size: 0.9375rem; color: var(--text-3); line-height: 1.65; }
-
-  /* Pillar grid */
-  .pillars { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin: 1.5rem 0; }
-  .pillar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem 1.2rem; text-align: center; }
-  .pillar-num { font-family: var(--font-head); font-size: 1.25rem; font-weight: 800; background: linear-gradient(135deg, var(--pink), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.3rem; }
-  .pillar-k { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-4); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
-  .pillar-body { font-size: 0.8125rem; color: var(--text-3); line-height: 1.55; }
-  @media (max-width: 640px) { .pillars { grid-template-columns: 1fr; } }
-
-  /* Callouts */
-  .precedent-callout { background: rgba(247,201,72,0.07); border: 1px solid rgba(247,201,72,0.2); border-radius: 14px; padding: 1.25rem 1.5rem; margin: 2rem 0; font-size: 0.9375rem; color: var(--text-2); line-height: 1.7; }
-  .precedent-callout strong { color: var(--gold); font-family: var(--font-head); font-weight: 700; }
-  .partner-callout { background: rgba(224,96,126,0.07); border: 1px solid rgba(224,96,126,0.2); border-radius: 14px; padding: 1.25rem 1.5rem; margin: 2rem 0; font-size: 0.9375rem; color: var(--text-2); line-height: 1.7; }
-  .partner-callout strong { color: var(--pink); font-family: var(--font-head); font-weight: 700; }
-
-  /* Closing mark */
-  .closing-mark { text-align: center; font-family: var(--font-head); font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, var(--pink), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 3rem 0 1.5rem; letter-spacing: -0.03em; }
-  .closing-sub { text-align: center; font-family: var(--font-mono); font-size: 0.6875rem; color: var(--text-4); letter-spacing: 0.18em; text-transform: uppercase; }
-
-  .scroll-footer { margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-  .footer-left { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--text-4); letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.6; }
-  .footer-nav { display: flex; gap: 1rem; }
-  .footer-link { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); text-decoration: none; transition: color 0.15s; }
-  .footer-link:hover, .footer-link.next { color: var(--pink); }
-  .scroll-indicator { position: fixed; top: 56px; left: 0; height: 2px; background: linear-gradient(90deg, var(--pink), var(--gold)); z-index: 99; transition: width 0.1s; }
-  @keyframes riseIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  @media (max-width: 640px) { .scroll-wrap { padding: 88px 1.25rem 80px; } nav { padding: 0 1.25rem; } }
+  body { margin: 0; background: #050509; color: #f5f5f7; font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 2rem; }
+  a { color: #e0607e; text-decoration: none; }
+  p { max-width: 420px; line-height: 1.6; font-size: 0.95rem; color: rgba(245,245,247,0.7); }
 </style>
 </head>
 <body>
-<div class="scroll-indicator" id="progressBar"></div>
-<nav>
-  <a class="nav-brand" href="index.html">Æ<span>ther</span> · Museion</a>
-  <span class="nav-meta">Scroll 020 of 020</span>
-</nav>
-<main class="scroll-wrap">
-  <div class="scroll-eyebrow">Architecture Series · Gentlemen of Muse</div>
-  <div class="scroll-number">020</div>
-  <div class="scroll-title">The Permanence Chain</div>
-  <div class="scroll-sub">Scroll 020 · Closing Synthesis · YAKK Studios · April 2026</div>
-  <div class="lede">
-    Twenty scrolls. One order. One chain of permanence — where a council verdict, an Alexandria scroll, and a partner surface carry the same weight because they are cryptographically the same thing. This is where the architecture stops being a thesis and becomes a product.
+  <div>
+    <p>This scroll lives in the private archive.<br/>Taking you to <a href="/">the current set</a>…</p>
+    <script>window.location.replace("/");</script>
   </div>
-  <div class="body-copy">
-    <h2>What the First Nineteen Scrolls Built</h2>
-    <p>The arc began with a wallet, a letter, and a refusal to participate in the extraction. It became a council of nineteen specialists, an archive of one hundred historical scrolls, a non-greedy covenant encoded as refusal paths, a memory model that tells the difference between the operator, the council, and the archive, and a HUD that embeds into partner surfaces without losing its voice.</p>
-    <p>This scroll closes the loop. Every verdict Aether returns produces a scroll. Every scroll is filed into Alexandria. Every Alexandria entry is pointed to by a partner embed. The chain is not a blockchain in the narrow sense — it is a chain of permanence: a sequence of evidence artefacts, each signed, each immutable, each reachable from any surface the user happens to be standing on.</p>
-
-    <blockquote><em>"A product that forgets is a product you have to sell again tomorrow. A product that remembers becomes the record — and the record becomes the moat."</em></blockquote>
-
-    <hr class="rule" />
-    <h2>Three Pillars of Permanence</h2>
-    <div class="pillars">
-      <div class="pillar">
-        <div class="pillar-num">01</div>
-        <div class="pillar-k">Council</div>
-        <div class="pillar-body">Nineteen specialists route the question, produce the verdict, sign the artefact. Every run is traceable.</div>
-      </div>
-      <div class="pillar">
-        <div class="pillar-num">02</div>
-        <div class="pillar-k">Archive</div>
-        <div class="pillar-body">Alexandria files the verdict as an RD-XXX or CS-XXX scroll. HTML, JSON, embedding — three shapes, one truth.</div>
-      </div>
-      <div class="pillar">
-        <div class="pillar-num">03</div>
-        <div class="pillar-k">Surface</div>
-        <div class="pillar-body">Partner HUDs embed the archived artefact. What a user sees is what the council said, word for word.</div>
-      </div>
-    </div>
-
-    <hr class="rule" />
-    <h2>The Twelve-Month Joint Roadmap</h2>
-    <p>Twelve months to take the architecture from partnership-ready to partnership-embedded. Four quarters, four deliverables each, one integrity contract holding across the whole arc. Dates are targets, not promises — the covenant of the system is that the evidence ships before the announcement, not the other way around.</p>
-
-    <div class="roadmap">
-      <div class="roadmap-item">
-        <div class="roadmap-left"><div class="roadmap-dot"></div><div class="roadmap-line"></div></div>
-        <div>
-          <div class="roadmap-qtr">Q2 2026 · Foundations</div>
-          <div class="roadmap-title">Council Public Read API + Archive Export</div>
-          <div class="roadmap-body">Expose CS-XXX and RD-XXX scrolls through a signed read API. Ship Alexandria in three shapes: HTML per scroll, JSON index, embedding vector. StakePoint pilot — validator cluster detection on a single pool. StreamLock pilot — creator-token HUD next to one channel.</div>
-        </div>
-      </div>
-      <div class="roadmap-item">
-        <div class="roadmap-left"><div class="roadmap-dot"></div><div class="roadmap-line"></div></div>
-        <div>
-          <div class="roadmap-qtr">Q3 2026 · Embed</div>
-          <div class="roadmap-title">Signed Partner HUD v1</div>
-          <div class="roadmap-body">Ship the embeddable HUD to both partners. Each embed carries a council attestation pointing to the exact run that produced the verdict. Ambient / Active / Urgent tiering live. First end-to-end flow: partner surface → ask Aether → council → archive → surface refresh.</div>
-        </div>
-      </div>
-      <div class="roadmap-item">
-        <div class="roadmap-left"><div class="roadmap-dot"></div><div class="roadmap-line"></div></div>
-        <div>
-          <div class="roadmap-qtr">Q4 2026 · Harden</div>
-          <div class="roadmap-title">Chain Interface + Proof-Before-Permanence Curation</div>
-          <div class="roadmap-body">Move scroll signing and indexing onto a minimal chain interface — not a full L1, a permanence layer. Formalise the curation pipeline: no scroll enters Alexandria without proof, provenance, and a council sign-off. First external audit of the archive integrity chain.</div>
-        </div>
-      </div>
-      <div class="roadmap-item">
-        <div class="roadmap-left"><div class="roadmap-dot"></div><div class="roadmap-line"></div></div>
-        <div>
-          <div class="roadmap-qtr">Q1 2027 · Open</div>
-          <div class="roadmap-title">Third-Party Embeds + Kaize Layer</div>
-          <div class="roadmap-body">Open the signed-HUD format to any partner, not just StakePoint and StreamLock. Kaize memory layer goes live: holders build their own Solo-Leveling record as a reachable artefact. The Hundredth-Scroll principle formalised — every canonical scroll gets a permanent on-chain anchor.</div>
-        </div>
-      </div>
-    </div>
-
-    <hr class="rule" />
-    <h2>What Each Partner Ships With</h2>
-    <p>The joint roadmap is only useful if each partner leaves the arc with something of their own. Not a feature they rent — a capability they own. The integrity contract is shared. The product shapes are distinct.</p>
-
-    <div class="partner-callout">
-      <strong>StreamLock · creator-economy integrity.</strong> A signed HUD on every creator token. A viewer sees a creator's pitch and the council verdict on the same pane of glass. Creator reputation becomes cryptographically tied to on-chain behaviour — not engagement metrics, not platform trust, but council-attested evidence. Creators who act in good faith compound reputation. Creators who coordinate exits get filed into Alexandria as they do it.
-    </div>
-
-    <div class="partner-callout">
-      <strong>StakePoint · staker-side validator forensics.</strong> A HUD panel on every validator page that treats staker-relevant signals as weather, not marketing. Cluster detection across validators. Fee-recipient concentration as a public number. Tier selection overlaid with yield-vs-risk from the council. Stakers get the same evidence as the protocol's own core team. Validators who behave well compound trust — the signal is permanent, not rewritten every cycle.
-    </div>
-
-    <div class="precedent-callout">
-      <strong>Precedent · AS-099 Council Chain Interface &amp; AS-100 The Hundredth Scroll.</strong> The archive's own doctrine: the hundredth scroll is never the end, it is the first that closes the loop. A system that writes scrolls but cannot point at them from the outside is a diary. A system that produces signed, addressable, chain-anchored scrolls that partners embed is an infrastructure layer. Permanence is not storage — permanence is reachability over time.
-    </div>
-
-    <hr class="rule" />
-    <h2>What This Partnership Is Not</h2>
-    <p>This is not a logo-swap. It is not a co-marketing agreement. It is not an integration in the loose sense where two APIs shake hands and part ways. It is a shared integrity contract: the council's verdicts become part of the partner's product surface, and the partner's product surface becomes part of the council's reach. Both sides take on responsibility for what the other shows the user.</p>
-
-    <p>It also is not permanent in the emotional sense. Either partner can walk. The covenant holds: whatever was archived during the partnership stays archived, stays reachable, stays attributed. The relationship is refusable; the record is not.</p>
-
-    <blockquote><em>"An archive outlives the partnership that produced it. If that scares a partner, this is not the right partner. If it steadies them, we can build."</em></blockquote>
-
-    <hr class="rule" />
-    <h2>The Closing Line</h2>
-    <p>Twenty scrolls is enough to describe the shape. A thousand is what the next year writes. The council runs, the archive files, the HUD surfaces, the covenant holds, the partner embeds, the user decides — and every loop of that cycle leaves behind another permanent artefact, until the empire is no longer a plan but a record. This is what we build next, together.</p>
-
-    <div class="closing-mark">Æther · Museion · Alexandria</div>
-    <div class="closing-sub">End of Scroll 020 · End of the Architecture Series · YAKK Studios · April 2026</div>
-  </div>
-  <footer class="scroll-footer">
-    <div class="footer-left">Museion · YAKK Studios · April 2026<br />Gentlemen of Muse</div>
-    <div class="footer-nav">
-      <a class="footer-link" href="scroll-019.html">← Scroll 019</a>
-      <a class="footer-link next" href="index.html">Return to Index →</a>
-    </div>
-  </footer>
-</main>
-<script>
-  const bar = document.getElementById('progressBar');
-  window.addEventListener('scroll', () => { bar.style.width = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100) + '%'; });
-</script>
 </body>
 </html>
